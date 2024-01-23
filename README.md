@@ -1,6 +1,6 @@
-[![CircleCI](https://img.shields.io/circleci/build/github/a6b8/evmProviders/main)]()
+[![CircleCI](https://img.shields.io/circleci/build/github/a6b8/evmNodes/main)]()
 
-# Evm Providers
+# Evm Nodes
 
 This module helps in checking the activity of lists of Evm Nodes. It simultaneously queries the `networkId`, measures the response speed of the server, and estimates whether the Nodes are Archive Nodes based on RPC URLs.
 
@@ -12,6 +12,7 @@ This module helps in checking the activity of lists of Evm Nodes. It simultaneou
 - Estimating whether historical data (Archive Node) can be queried through the Node.
 - Output as a structured list divided into inactive and active.
 
+
 ## Quickstart
 This example shows how to query public Nodes.
 
@@ -22,10 +23,11 @@ const states = await evnNodes.getPublicNodes({})
 ```
 
 ## Table of Contents
-- [Evm Providers](#evm-providers)
+- [Evm Nodes](#evm-nodes)
   - [Features:](#features)
   - [Quickstart](#quickstart)
   - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
   - [Methods](#methods)
     - [.getNodes()](#getnodes)
     - [.getPrivateNodes()](#getprivatenodes)
@@ -33,6 +35,32 @@ const states = await evnNodes.getPublicNodes({})
   - [Alias Names](#alias-names)
 - [Output](#output)
   - [License](#license)
+
+
+## Overview
+
+This module
+1. Partially retrieves URLs synchronously.
+2. Merges different lists if necessary.
+3. Analyzes the URLs for availability and other important features.
+4. Generates structured output.
+
+
+```
+1 Private Lists*    Public Lists*
+     |                    |
+2     ------ Merge* -------
+               |
+3 ---------- Analysis -----------             
+  |  getStatus, connectionTime |
+  |     isArchive, version     |
+  ------------------------------
+               |
+4 ----------- Output -----------
+  |    lvl1: sort by status    |
+  |   lvl2: sort by key/alias  |
+  ------------------------------
+```
 
 ## Methods
 There are three public methods defined: `getPrivateNodes`, `getPublicNode`, and `getNodes`. The latter executes both previous methods one after the other and outputs the result together. All three methods return the same structure as the result. They can evaluate 'private' and 'public' Nodes. 'Private' refers to a list of Nodes added by the user themselves, which may also have an API Key in the URL. 'Public' combines and evaluates public lists via an HTTPS request.
@@ -83,7 +111,7 @@ This method creates a list from various files and then determines the status of 
 
 **Method**  
 ```js
-.getPrivateNodes( { paths=[], onlyActive=false } )
+.getPrivateNodes( { paths=[], onlyActive=false, aliasAsKey=false } )
 ```
 
 **Example**  
@@ -116,6 +144,14 @@ This method searches for current public Nodes through publicly available [lists]
 **Method**  
 ```js
 .getPublicNodes( { onlyActive=false, aliasAsKey=false } )
+```
+
+**Example**
+```
+import { EvmNodes } from './../src/EvmNodes.mjs'
+
+const evnNodes = new EvmNodes()
+const states = await evnNodes.getPublicNodes( {} )
 ```
 
 **Returns**    
