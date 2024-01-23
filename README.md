@@ -150,7 +150,7 @@ This method searches for current public Nodes through publicly available [lists]
 ```
 
 #### Example
-```
+```js
 import { EvmNodes } from './../src/EvmNodes.mjs'
 
 const evnNodes = new EvmNodes()
