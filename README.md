@@ -30,8 +30,11 @@ const states = await evnNodes.getPublicNodes({})
   - [Overview](#overview)
   - [Methods](#methods)
     - [.getNodes()](#getnodes)
+      - [Example](#example)
     - [.getPrivateNodes()](#getprivatenodes)
+      - [Example](#example-1)
     - [.getPublicNodes()](#getpublicnodes)
+      - [Example](#example-2)
   - [Alias Names](#alias-names)
 - [Output](#output)
   - [License](#license)
@@ -80,7 +83,7 @@ This method combines `.getPrivateNode()` and `.getPublicNode()` and returns a re
 async getNodes( { privatePaths=[], onlyActive=false, aliasAsKey=false } )
 ```
 
-**Example**  
+#### Example  
 ```js
 import { EvmNodes } from './../src/EvmNodes.mjs'
 
@@ -114,7 +117,7 @@ This method creates a list from various files and then determines the status of 
 .getPrivateNodes( { paths=[], onlyActive=false, aliasAsKey=false } )
 ```
 
-**Example**  
+#### Example 
 ```js
 import { EvmNodes } from './../src/EvmNodes.mjs'
 
@@ -146,7 +149,7 @@ This method searches for current public Nodes through publicly available [lists]
 .getPublicNodes( { onlyActive=false, aliasAsKey=false } )
 ```
 
-**Example**
+#### Example
 ```
 import { EvmNodes } from './../src/EvmNodes.mjs'
 
