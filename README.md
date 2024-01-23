@@ -74,7 +74,7 @@ This method combines `.getPrivateNode()` and `.getPublicNode()` and returns a re
 
 | Key           | Type   | Description                                         | Required |
 | ------------- | ------ | --------------------------------------------------- | -------- |
-| privatePaths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | ``true`     |
+| privatePaths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | `true`     |
 | onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
 | aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
 
@@ -164,9 +164,9 @@ Object{}
 
 ## Alias Names
 
-Aliases are also used in the queries if available. The list can be found here:
+Aliases are also used in the queries if available. The list can be found here: ./src/data/alias.mjs. 
 
- `./src/data/alias.mjs`. If a network is missing, you are welcome to contribute the missing information via a pull request.
+If a network is missing, you are welcome to contribute the missing information via a pull request.
 
 Example:
 ```js
