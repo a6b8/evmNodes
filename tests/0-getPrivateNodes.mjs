@@ -3,7 +3,7 @@ import { EvmNodes } from './../src/EvmNodes.mjs'
 const evnNodes = new EvmNodes()
 const states = await evnNodes.getPrivateNodes( {
     'paths': [ 
-        { 'path': './tests/.example-env', 'type': 'env' }
+        { 'path': './tests/.example-env', 'parser': 'env' }
     ]
 } )
 

@@ -26,6 +26,12 @@ export const config = {
                     }
                 ],
                 'id': 1
+            },
+            'clientVersion': {
+                'jsonrpc': '2.0',
+                'method': 'web3_clientVersion',
+                'params': [],
+                'id': 1
             }
         },
     },

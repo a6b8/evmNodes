@@ -95,21 +95,25 @@ export class Status {
         for( const chunk of chunks ) {
             const result = await Promise.all( 
                 chunk.map( async url => {
-                    const struct = {}
-
                     const { status, networkId, timeInMs } = await this.#getRpcStatus( { url } )
 
-                    struct['url'] = url
-                    struct['status'] = status
-                    struct['networkId'] = networkId
-                    struct['isArchive'] = false
-                    struct['timeInMs'] = timeInMs
-                    struct['source'] = source
+                    const struct = {
+                        url,
+                        status,
+                        networkId,
+                        'isArchive': false,
+                        timeInMs,
+                        source,
+                        'clientVersion': null
+                    }
 
                     if( struct['status'] === true ) {
                         const resp = await this.#getRpcIsArchiveNode( { url } )
-                        struct['isArchive'] = resp['isArchive'] !== undefined ? resp['isArchive'] : null
+                        resp['isArchive'] !== undefined ? struct['isArchive'] = resp['isArchive'] : ''
                         struct['isArchive'] ? this.#progress['isArchive'].add( url ) : null
+
+                        const resp2 = await this.#getRpcClientVersion( { url } )
+                        resp2['clientVersion'] !== undefined ? struct['clientVersion'] = resp2['clientVersion'] : ''
                     }
 
                     status ? this.#progress['rpcs'].add( url ) : null
@@ -199,6 +203,23 @@ export class Status {
         } catch( e ) {
             // console.log( e )
         }
+        return result
+    }
+
+
+    async #getRpcClientVersion( { url } ) {
+        let result = {
+            url,
+            'status': false,
+            'clientVersion': null,
+        }
+
+        try {
+            const data = this.#config['status']['requests']['clientVersion']
+            const response = await this.#rpcRequest( { url, data } )
+            result['clientVersion'] = response['data']['result']
+        } catch( e ) {}
+
         return result
     }
 

@@ -96,7 +96,7 @@ export class EvmNodes {
  */
 
     async getNodes( { privatePaths=[], onlyActive=false, aliasAsKey=false } ) {
-        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths } )
+        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths, onlyActive, aliasAsKey } )
         printMessages( { messages, comments } )
 
         const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths } )
@@ -137,7 +137,7 @@ export class EvmNodes {
 
     async getPrivateNodes( { paths=[], onlyActive=false, aliasAsKey=false } ) {
         const privatePaths = paths
-        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths } )
+        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths, onlyActive, aliasAsKey } )
         printMessages( { messages, comments } )
 
         const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths } )
@@ -209,6 +209,10 @@ export class EvmNodes {
                             'url': item['url'],
                             'timeInMs': item['timeInMs'],
                             'source': item['source'],
+                        }
+
+                        if( Object.hasOwn( item, 'clientVersion' ) ) {
+                            struct['clientVersion'] = item['clientVersion']
                         }
 
                         switch( key ) {

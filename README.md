@@ -5,12 +5,13 @@
 This module helps in checking the activity of lists of Evm Nodes. It simultaneously queries the `networkId`, measures the response speed of the server, and estimates whether the Nodes are Archive Nodes based on RPC URLs.
 
 ## Features:
-- Checking if the Node is available.
-- Adding a human-readable Alias Name ID, for example, `ETHEREUM_MAINNET`, if known.
-- Verifying which `networkId` the Node has.
-- Measuring the `timeInMs` taken for the connection and later sorting the results from fastest to slowest.
+- Checking the availability of the Node.
+- Adding a human-readable Alias Name ID, e.g., `ETHEREUM_MAINNET`, if it's known.
+- Verifying the `networkId` of the Node.
+- Measuring the `timeInMs` taken for the connection and subsequently sorting the results from fastest to slowest.
 - Estimating whether historical data (`isArchive`) can be queried through the Node.
-- Output as a structured list divided into inactive and active.
+- Querying the Client Version (`clientVersion`) of the URL.
+- Outputting the results as a structured list divided into `inactive` and `active`.
 
 
 ## Quickstart
@@ -36,7 +37,7 @@ const states = await evnNodes.getPublicNodes({})
     - [.getPublicNodes()](#getpublicnodes)
       - [Example](#example-2)
   - [Alias Names](#alias-names)
-- [Output](#output)
+  - [Output](#output)
   - [License](#license)
 
 
@@ -62,6 +63,7 @@ This module
 4 ----------- Output -----------
   |    lvl1: sort by status    |
   |   lvl2: sort by key/alias  |
+  |   lvl3: sort by rpc/webs.  |
   ------------------------------
 ```
 
@@ -189,7 +191,7 @@ const alias = {
 ```
 
 
-# Output
+## Output
 The structure is the same for all three methods. The results are divided into `active` and `inactive`. Whether `inactive` results are included can be optionally configured. In `active`, the individual networks are divided by `networkId`. This can optionally be changed to use the `alias` name with the `aliasAsKey` option.
 
 Output
