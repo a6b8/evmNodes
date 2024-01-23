@@ -125,7 +125,9 @@ const evnNodes = new EvmNodes()
 const states = await evnNodes.getPrivateNodes( {
     'paths': [ 
         { 'path': './tests/.example-env', 'parser': 'env' }
-    ]
+    ],
+    'onlyActive': true,
+    'aliasAsKey': true
 } )
 ```
 
@@ -154,7 +156,10 @@ This method searches for current public Nodes through publicly available [lists]
 import { EvmNodes } from './../src/EvmNodes.mjs'
 
 const evnNodes = new EvmNodes()
-const states = await evnNodes.getPublicNodes( {} )
+const states = await evnNodes.getPublicNodes( {
+    'onlyActive': true,
+    'aliasAsKey': true
+} )
 ```
 
 **Returns**    
