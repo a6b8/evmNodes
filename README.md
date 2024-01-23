@@ -1,4 +1,4 @@
-[![CircleCI](https://img.shields.io/circleci/build/github/a6b8/evmNodes/main)]()
+[![CircleCI](https://img.shields.io/circleci/build/github/a6b8/evmNodes/main)]() ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
 # Evm Nodes
 
@@ -8,8 +8,8 @@ This module helps in checking the activity of lists of Evm Nodes. It simultaneou
 - Checking if the Node is available.
 - Adding a human-readable Alias Name ID, for example, `ETHEREUM_MAINNET`, if known.
 - Verifying which `networkId` the Node has.
-- Measuring the time taken for the connection and later sorting the results from fastest to slowest.
-- Estimating whether historical data (Archive Node) can be queried through the Node.
+- Measuring the `timeInMs` taken for the connection and later sorting the results from fastest to slowest.
+- Estimating whether historical data (`isArchive`) can be queried through the Node.
 - Output as a structured list divided into inactive and active.
 
 
