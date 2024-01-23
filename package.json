@@ -1,0 +1,19 @@
+{
+  "name": "evmnodes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/EvmNodes.mjs",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "a6b8",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.5",
+    "ora": "^8.0.1"
+  }
+}

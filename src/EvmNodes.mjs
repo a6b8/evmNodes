@@ -1,0 +1,313 @@
+/**
+ * Represents an RPC (Remote Procedure Call) node.
+ *
+ * @typedef {Object} rpcStruct
+ * @property {string} url - The URL of the RPC node.
+ * @property {number} timeInMs - The connection time to the RPC node in milliseconds.
+ * @property {string} source - The source of the RPC node (public/private).
+ */
+
+/**
+ * Represents a WebSocket node.
+ *
+ * @typedef {Object} websocketStruct
+ * @property {string} url - The WebSocket URL.
+ * @property {number} timeInMs - The connection time to the WebSocket node in milliseconds.
+ * @property {string} source - The source of the WebSocket node (public/private).
+ */
+
+/**
+ * Represents an active network with nodes.
+ *
+ * @typedef {Object} ActiveNetwork
+ * @property {string} alias - The alias for the network.
+ * @property {rpcStruct[]} lightNodes - An array of RPC nodes for light nodes.
+ * @property {rpcStruct[]} archiveNodes - An array of RPC nodes for archive nodes.
+ * @property {websocketStruct[]} websockets - An array of WebSocket nodes.
+ */
+
+/**
+ * Represents an inactive node.
+ *
+ * @typedef {Object} inactiveStruct
+ * @property {string} url - The WebSocket URL.
+ * @property {string} source - The source of the WebSocket node (public/private).
+ */
+
+/**
+ * Represents the structure of the return value of the `getNodes` method.
+ *
+ * @typedef {Object} GetNodesResponse
+ * @property {ActiveNetwork} active - An object representing active network nodes.
+ * @property {inactiveStruct[]} inactive - An array of inactive nodes.
+ */
+
+
+import { config } from './data/config.mjs'
+import { alias } from './data/alias.mjs'
+
+import { printMessages } from './helpers/mixed.mjs'
+
+import { Lists } from './provider/Lists.mjs'
+import { Status } from './provider/Status.mjs'
+
+import ora from 'ora'
+import fs from 'fs'
+import crypto from 'crypto'
+
+
+export class EvmNodes {
+    #config
+    #lists
+    #status
+
+
+    constructor() {
+        this.#config = config
+        this.#init()
+
+        return true
+    }
+
+
+    #init() {
+        this.#lists = new Lists( {
+            'lists': this.#config['lists']
+        })
+        this.#status = new Status({ 
+            'status': this.#config['status']
+        } )
+
+        return true
+    }
+
+
+/**
+ * Fetches and returns a list of nodes, combining private and public nodes.
+ *
+ * @async
+ * @param {Object} options - Options for fetching nodes.
+ * @param {Array<{ path: string, type: 'env' | 'script' }>} options.paths - An array of objects representing paths and their types.
+ *   Each object should have a 'path' property (a string representing the file path) and a 'type' property (either 'env' or 'script').
+ * @param {boolean} options.filterStatus - Whether to filter nodes by status.
+ * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
+ * @throws {Error} If there is an issue fetching the nodes.
+ */
+
+    async getNodes( { privatePaths=[], filterStatus=false } ) {
+        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths } )
+        printMessages( { messages, comments } )
+
+        const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths } )
+        let _private = await this.#status.start( { rpcs, websockets, filterStatus, 'source':'private' } )
+
+        const list = await this.#lists.getPublicNodes()
+
+        let _public = await this.#status.start( { 
+            'rpcs': list['rpcs'], 
+            'websockets': list['websockets'], 
+            filterStatus, 
+            'source':'public' 
+        } )
+
+        let states = {
+            'rpcs': _private['rpcs'].concat( _public['rpcs'] ),
+            'websockets': _private['websockets'].concat( _public['websockets'] )
+        }
+
+        states = this.#sortByNetworkId( { states } )
+
+        return states
+    }
+
+
+/**
+ * Fetches and returns a list of private nodes.
+ *
+ * @async
+ * @param {Object} options - Options for fetching nodes.
+ * @param {Array<{ path: string, type: 'env' | 'script' }>} options.paths - An array of objects representing paths and their types.
+ *   Each object should have a 'path' property (a string representing the file path) and a 'type' property (either 'env' or 'script').
+ * @param {boolean} options.filterStatus - Whether to filter nodes by status.
+ * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
+ * @throws {Error} If there is an issue fetching the nodes.
+ */
+
+    async getPrivateNodes( { paths=[], filterStatus=false } ) {
+        const privatePaths = paths
+        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths } )
+        printMessages( { messages, comments } )
+
+        const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths } )
+        let states = await this.#status.start( { rpcs, websockets, filterStatus, 'source':'private' } )
+        states = this.#sortByNetworkId( { states } )
+
+        return states
+    }
+
+
+/**
+ * Fetches and returns a list of public nodes.
+ *
+ * @async
+ * @param {Object} options - Options for fetching nodes.
+ * @param {boolean} options.filterStatus - Whether to filter nodes by status.
+ * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
+ * @throws {Error} If there is an issue fetching the nodes.
+ */
+
+    async getPublicNodes( { filterStatus=false } ) {
+        console.log( 'List' )
+        const { rpcs, websockets } = await this.#lists.getPublicNodes()
+        let states = await this.#status.start( { rpcs, websockets, filterStatus, 'source':'public' } )
+        states = this.#sortByNetworkId( { states } )
+        return states
+    }
+
+
+    #sortByNetworkId( { states } ) {
+        let result = [ 
+            'rpcs', 
+            'websockets' 
+        ]
+            .reduce( ( acc, key, index ) => {
+                if( index === 0 ) {
+                    acc['active'] = {}
+                    acc['inactive'] = []
+                }
+
+                states[ key ]
+                    .forEach( ( item, index ) => {
+                        const { networkId } = item
+
+                        if( item['status'] === false ) {
+                            acc['inactive'].push( item )
+                            return true
+                        }
+
+                        let id = `${networkId}`
+                        if( !Object.hasOwn( acc['active'], networkId ) ) {
+                            acc['active'][ id ] = {
+                                'alias': '', 
+                                'lightNodes': [],
+                                'archiveNodes': [],
+                                'websockets': []
+                            }
+        
+                            if( Object.hasOwn( alias, id ) ) {
+                                acc['active'][ networkId ]['alias'] = alias[ id ]['alias']
+                            }
+                        }
+
+                        const struct = {
+                            'url': item['url'],
+                            'timeInMs': item['timeInMs'],
+                            'source': item['source'],
+                        }
+
+                        switch( key ) {
+                            case 'rpcs':
+                                if( item['isArchive'] ) {
+                                    acc['active'][ id ]['archiveNodes'].push( struct )
+                                } else {
+                                    acc['active'][ id ]['lightNodes'].push( struct )
+                                }
+                                break
+                            case 'websockets':
+                                acc['active'][ id ]['websockets'].push( struct )
+                                break
+                        }
+
+                        return true
+                    } )
+                return acc
+            }, {} )
+
+        result['active'] = Object.keys( result['active'] )
+            .map( a => parseInt( a ) )
+            .sort( ( a, b ) => a - b )
+            .reduce( ( acc, a, index ) => {
+                const id = `${a}`
+                acc[ id ] = result['active'][ id ]
+
+                const tmp = [ 'lightNodes', 'archiveNodes', 'websockets' ]
+                    .forEach( key => {
+                        acc[ id ][ key ] = acc[ id ][ key ]
+                            .sort( ( a, b ) => a['timeInMs'] - b['timeInMs'] )
+                    } )
+
+                return acc
+            }, {} )
+
+        result['inactive'] = result['inactive']
+            .map( a => {
+                delete a['timeInMs']
+                delete a['status']
+                delete a['isArchive']
+                delete a['networkId']
+                return a
+            } )
+            .sort( ( a, b ) => {
+                const _a = `${a.url}`
+                const _b = `${b.url}`
+
+                return _b.localeCompare( _a, 'en', { sensitivity: 'base' } )
+            } )
+
+        return result
+    }
+
+
+    #validateGetPrivateNodes( { privatePaths } ) {
+        const messages = []
+        const comments = []
+
+        if( privatePaths === undefined ) {
+            messages.push( `Key 'privatePaths' is undefined.` )
+        } else if( !Array.isArray( privatePaths ) ) {
+            messages.push( `Key 'privatePaths' is not an array.` )
+        } else if( privatePaths.length === 0 ) {
+            messages.push( `Key 'privatePaths' is empty.` ) 
+        }
+
+        if( messages.length > 0 ) {
+            return [ messages, comments ]
+        }
+
+        privatePaths
+            .forEach( ( item, index ) => {
+                if( item === undefined ) {
+                    messages.push( `[${index}] Item is type of 'undefined'.` )
+                } else if( item.constructor !== Object ) {
+                    messages.push( `[${index}] Item with the value '${item}' is not type of 'object'.` )
+                }
+            } )
+
+        if( messages.length !== 0 ) {
+            return [ messages, comments ]
+        }
+
+        privatePaths
+            .forEach( ( item, index ) => {
+                if( !Object.hasOwn( item, 'path' ) ) {
+                    messages.push( `[${index}] Item has no key 'path'.` )
+                } else if( !fs.existsSync( item['path'] ) ) {
+                    messages.push( `[${index}] Item with the value '${item['path']}' does not exist.` )
+                }
+                
+                if( !Object.hasOwn( item, 'type' ) ) {
+                    messages.push( `[${index}] Item has no key 'type'.` )
+                    return true
+                } else if( !this.#config['lists']['types'].includes( item['type'] ) ) {
+                    messages.push( `[${index}] Item has an unknown type '${item['type']}'. Choose from ${this.#config['lists']['types'].map( a => `'${a}'`).join( ', ' )} instead.` )
+                }
+            } )
+
+        return [ messages, comments ]
+    }
+
+
+    health() {
+        return true
+    }
+}
