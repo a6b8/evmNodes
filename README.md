@@ -164,9 +164,7 @@ Object{}
 
 ## Alias Names
 
-Aliases are also used in the queries if available. The list can be found here: `./src/data/alias.mjs`. 
-
-If a network is missing, you are welcome to contribute the missing information via a pull request.
+Aliases are also used in the queries if available. The list can be found here: `./src/data/alias.mjs`. If a network is missing, you are welcome to contribute the missing information via a pull request.
 
 Example:
 ```js
