@@ -2,19 +2,18 @@
 
 # Evm Providers
 
-Dieses Modul hilft um Listen von Evm Nodes auf aktivität zu überprüfen. Erfragt gleichzeitig die `networkId`, misst die Geschwindigkeit in der der Server anwortet und schätzt bei RPC Urls ob die Nodes eine ArchivNode ist.
+This module helps in checking the activity of lists of Evm Nodes. It simultaneously queries the `networkId`, measures the response speed of the server, and estimates whether the Nodes are Archive Nodes based on RPC URLs.
 
-Funktionsumfang:
-- Überprüfen ob die Node  verfügbar ist
-- Fügt, wenn Bekannt, einem human readable Alias Name ID, zum Beispiel `ETHEREUM_MAINNET` ein.
-- Überprüft welche `networkId` die Node hat.
-- Misst die Zeit wielange die Verbindung gebraucht hat und ordnet die Resultate später von schnell zu langsam.
-- Ein Schätzung ob sich über die Node auch historischen Daten (Archive Node) abfragen lassen. 
-- Ausgabe als Strukturierte Liste unterteilt in inactive und aktive
-
+## Features:
+- Checking if the Node is available.
+- Adding a human-readable Alias Name ID, for example, `ETHEREUM_MAINNET`, if known.
+- Verifying which `networkId` the Node has.
+- Measuring the time taken for the connection and later sorting the results from fastest to slowest.
+- Estimating whether historical data (Archive Node) can be queried through the Node.
+- Output as a structured list divided into inactive and active.
 
 ## Quickstart
-Dieses Beispiel zeigt wie sich öffentliche Nodes abfragen lassen.
+This example shows how to query public Nodes.
 
 ```js
 import { EvmNodes } from './../src/EvmNodes.mjs'
@@ -23,8 +22,8 @@ const states = await evnNodes.getPublicNodes({})
 ```
 
 ## Table of Contents
-
 - [Evm Providers](#evm-providers)
+  - [Features:](#features)
   - [Quickstart](#quickstart)
   - [Table of Contents](#table-of-contents)
   - [Methods](#methods)
@@ -36,22 +35,24 @@ const states = await evnNodes.getPublicNodes({})
   - [License](#license)
 
 ## Methods
-Es sind 3 öffentliche Methode definiert. `getPrivateNodes`, `getPublicNode` und `getNodes` was beide vorherigen Methoden nacheinander ausführt und das Ergebnis gemeinsam ausgibt. Alle 3 Methoden geben die gleiche Struktur als resultat zurück. Es können 'private' und 'public' Nodes ausgewertet werden. Private meint das eine Liste von Nodes vom nutzer selbst hinzugefügt wird, die zum Beispiel auch über einen API Key in der URL verfügen. Bei public werden über einen https request öffentliche Listen zusammengeführt und ausgewertet. 
+There are three public methods defined: `getPrivateNodes`, `getPublicNode`, and `getNodes`. The latter executes both previous methods one after the other and outputs the result together. All three methods return the same structure as the result. They can evaluate 'private' and 'public' Nodes. 'Private' refers to a list of Nodes added by the user themselves, which may also have an API Key in the URL. 'Public' combines and evaluates public lists via an HTTPS request.
 
 ### .getNodes()
 
-Diese Methode verbindet `.getPrivateNode()` und `.getPublicNode()` miteinander und gibt ein Resultat zurück.
+This method combines `.getPrivateNode()` and `.getPublicNode()` and returns a result.
 
 | Key           | Type   | Description                                         | Required |
 | ------------- | ------ | --------------------------------------------------- | -------- |
-| privatePaths     | Array of Object | Hier wird jeweils ein Object mit den key `path` und `parser` übergeben. `path` gibt den pfad an, bei `parser` stehen 2 mœglichkeiten zur Verfügung `env` oder `script`. `env` sucht nach `key=url\n` zeilen. `script` sucht nach urls in `"url"` anführungszeichen.                     | true     |
-| onlyActive | Boolean | Bestimmt ob als Resultat auch die nicht inaktiven Nodes in der Rubrik `inactive` aufgeführt werden soll | false |
-| aliasAsKey | Boolean | Per default werden die `active` Ergenisse nach `networkId` sortiert, das kann mit dieser Methode auf `alias` umgestellt werden. Falls kein alias hinterlegt wird `UNKNOWN_${{networkId}}` verwendet. | false |
+| privatePaths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | true     |
+| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | false |
+| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | false |
 
-**methode**  
-`async getNodes( { privatePaths=[], onlyActive=false, aliasAsKey=false } )`  
+**Method**  
+```js
+async getNodes( { privatePaths=[], onlyActive=false, aliasAsKey=false } )
+```
 
-**beispiel**  
+**Example**  
 ```js
 import { EvmNodes } from './../src/EvmNodes.mjs'
 
@@ -60,30 +61,32 @@ const states = await evnNodes.getNodes( {
     'privatePaths': [ 
         { 'path': './tests/.example-env', 'type': 'env' }
     ],
-    'onlyActive': true
+    'onlyActive': true,
     'aliasAsKey': true
 } )
 ```
 
-**returns**  
-`Object{}`
-
+**Returns**  
+```js
+Object{}
+```
 
 ### .getPrivateNodes()
 
-Diese Methode erstellt eine Liste auf verschiedenen Dateien um dann den Status der jeweiligen Url zu ermitteln.
-
+This method creates a list from various files and then determines the status of each URL.
 
 | Key           | Type   | Description                                         | Required |
 | ------------- | ------ | --------------------------------------------------- | -------- |
-| paths     | Array of Object | Hier wird jeweils ein Object mit den key `path` und `parser` übergeben. `path` gibt den pfad an, bei `parser` stehen 2 möglichkeiten zur Verfügung `env` oder `script`. `env` sucht nach `key=url\n` zeilen. `script` sucht nach urls in `"url"` anführungszeichen.                     | true     |
-| onlyActive | Boolean | Bestimmt ob als Resultat auch die nicht inaktiven Nodes in der Rubrik `inactive` aufgeführt werden soll | false |
-| aliasAsKey | Boolean | Per default werden die `active` Ergenisse nach `networkId` sortiert, das kann mit dieser Methode auf `alias` umgestellt werden. Falls kein alias hinterlegt wird `UNKNOWN_${{networkId}}` verwendet. | false |
+| paths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | true     |
+| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | false |
+| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | false |
 
-**methoden**  
-`.getPrivateNodes( { paths=[], onlyActive=false } )`  
+**Method**  
+```js
+.getPrivateNodes( { paths=[], onlyActive=false } )
+```
 
-**beispiel**  
+**Example**  
 ```js
 import { EvmNodes } from './../src/EvmNodes.mjs'
 
@@ -95,33 +98,38 @@ const states = await evnNodes.getPrivateNodes( {
 } )
 ```
 
-
-returns  
-`Object{}`
+**Returns**  
+```js
+Object{}
+```
 
 ### .getPublicNodes()
 
-Diese Methode sucht über nach aktuellen öffentlichen Nodes über öffentlich verfügbaren [Listen](https://github.com/a6b8/evmProviders/blob/a5533c544bc9668ac94e1305208931dd28b06dd5/src/data/config.mjs#L32).
+This method searches for current public Nodes through publicly available [lists](https://github.com/a6b8/evmProviders/blob/a5533c544bc9668ac94e1305208931dd28b06dd5/src/data/config.mjs#L32).
 
 | Key           | Type   | Description                                         | Required |
 | ------------- | ------ | --------------------------------------------------- | -------- |
-| onlyActive | Boolean | Bestimmt ob als Resultat auch die nicht inaktiven Nodes in der Rubrik `inactive` aufgeführt werden soll | false |
-| aliasAsKey | Boolean | Per default werden die `active` Ergenisse nach `networkId` sortiert, das kann mit dieser Methode auf `alias` umgestellt werden. Falls kein alias hinterlegt wird `UNKNOWN_${{networkId}}` verwendet. | false |
+| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | false |
+| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | false |
 
 
-**method**  
-`.getPublicNodes( { onlyActive=false, aliasAsKey=false } )`
+**Method**  
+```js
+.getPublicNodes( { onlyActive=false, aliasAsKey=false } )
+```
 
-
-**returns**    
-`Object{}`
-
+**Returns**    
+```js
+Object{}
+```
 
 ## Alias Names
 
-Es wird bei den Abfragen auch ein Alias wenn vorhanden eingesetzt. Die Liste ist hier zu finden: `./src/data/alias.mjs`. Falls eine Netzwerk kann gerne über eine pull request die fehlenden Informatioen eingesetzt werden.
+Aliases are also used in the queries if available. The list can be found here:
 
-Bespiel:
+ `./src/data/alias.mjs`. If a network is missing, you are welcome to contribute the missing information via a pull request.
+
+Example:
 ```js
 const alias = {
     "1": {
@@ -140,8 +148,7 @@ const alias = {
 
 
 # Output
-Die Struktur ist bei allen 3 Methoden gleich. Die Resultate werden in `active` und `inactive` unterteilt. Ob `inactive` Resultate mit ausgegeben werden kann optional ausgestellt werden. In `active` werden die einzelnen Netzwerke per `networkId` unterteilt. Dies kann optionnal auch auf den  `alias` namen geändert werden. Mit der option `aliasAsKey`.
-
+The structure is the same for all three methods. The results are divided into `active` and `inactive`. Whether `inactive` results are included can be optionally configured. In `active`, the individual networks are divided by `networkId`. This can optionally be changed to use the `alias` name with the `aliasAsKey` option.
 
 Output
 ```js
@@ -185,8 +192,6 @@ Output
     ]
 }
 ```
-
-
 
 ## License
 
