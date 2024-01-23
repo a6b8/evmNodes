@@ -56,6 +56,7 @@ import fs from 'fs'
 import crypto from 'crypto'
 
 
+
 export class EvmNodes {
     #config
     #lists
@@ -163,7 +164,6 @@ export class EvmNodes {
         const[ messages, comments ] = this.#validateGetPublicNodes( { onlyActive, aliasAsKey } )
         printMessages( { messages, comments } )
 
-        console.log( 'List' )
         const { rpcs, websockets } = await this.#lists.getPublicNodes()
         let states = await this.#status.start( { rpcs, websockets, onlyActive, 'source':'public' } )
         states = this.#sortByNetworkId( { states, aliasAsKey } )
@@ -345,7 +345,7 @@ export class EvmNodes {
             messages.push( `Key 'aliasAsKey' is not type of 'boolean'.` )
         }
 
-        return true
+        return [ messages, comments ]
     }
 
 

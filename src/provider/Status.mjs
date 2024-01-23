@@ -1,11 +1,13 @@
 import axios from 'axios'
 import WebSocket  from 'ws'
+import readline from 'readline'
 
 
 export class Status {
     #config
     #progress
     #state
+    #readline
 
 
     constructor( { status }) {
@@ -44,6 +46,7 @@ export class Status {
 
         states['rpcs'] = rpcData
         states['websockets'] = websocketData    
+        // this.#readline.close()
 
         return states
     }
@@ -282,7 +285,7 @@ export class Status {
             try {
                 ws = new WebSocket( url )
 
-                setTimeout(() => {
+                setTimeout( () => {
                     ws.close()
                     // console.log( 'WebSocket connection closed after 5 seconds.' )
                 }, 10000 )
@@ -330,12 +333,23 @@ export class Status {
 
 
     #printStatus( { status } ) {
+        if( this.#progress['nonce'] === 0 ) {
+            this.#readline = readline.createInterface( {
+                'input': process.stdin,
+                'output': process.stdout,
+            } )
+        }
+
         if( status ) {
             this.#progress['nonce']++
             if( this.#progress['nonce'] % 5 === 0 || this.#progress['nonce'] === 1 ) {
                 process.stdout.clearLine( 0 )
                 process.stdout.cursorTo( 0 )
-                console.log( `${this.#progress['rpcs'].size}, ${this.#progress['websockets'].size}, ${this.#progress['isArchive'].size}` )
+                this.#readline.write(null, { ctrl: true, name: 'u' });
+
+                let currentString = `${this.#progress['rpcs'].size}, ${this.#progress['websockets'].size}, ${this.#progress['isArchive'].size}`
+                this.#readline.write(currentString)
+
             }
         }
 
