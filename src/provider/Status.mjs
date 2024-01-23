@@ -19,8 +19,8 @@ export class Status {
     }
 
 
-    async start( { rpcs, websockets, filterStatus, source } ) {
-        this.#state = { filterStatus }
+    async start( { rpcs, websockets, onlyActive, source } ) {
+        this.#state = { onlyActive }
 
         const chunks = this.#groupingUrls( { rpcs, websockets } )
         const states = {
@@ -82,7 +82,7 @@ export class Status {
             results = results.concat( result )
         }
 
-        if( this.#state['filterStatus'] ) {
+        if( this.#state['onlyActive'] ) {
             results = results.filter( a => a['status'] === true )
         }
 
@@ -121,7 +121,7 @@ export class Status {
             results = results.concat( result )
         }
 
-        if( this.#state['filterStatus'] ) {
+        if( this.#state['onlyActive'] ) {
             results = results.filter( a => a['status'] === true )
         }
 

@@ -89,24 +89,24 @@ export class EvmNodes {
  * @param {Object} options - Options for fetching nodes.
  * @param {Array<{ path: string, type: 'env' | 'script' }>} options.paths - An array of objects representing paths and their types.
  *   Each object should have a 'path' property (a string representing the file path) and a 'type' property (either 'env' or 'script').
- * @param {boolean} options.filterStatus - Whether to filter nodes by status.
+ * @param {boolean} options.onlyActive - Whether to filter nodes by status.
  * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */
 
-    async getNodes( { privatePaths=[], filterStatus=false } ) {
+    async getNodes( { privatePaths=[], onlyActive=false, aliasAsKey=false } ) {
         const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths } )
         printMessages( { messages, comments } )
 
         const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths } )
-        let _private = await this.#status.start( { rpcs, websockets, filterStatus, 'source':'private' } )
+        let _private = await this.#status.start( { rpcs, websockets, onlyActive, 'source':'private' } )
 
         const list = await this.#lists.getPublicNodes()
 
         let _public = await this.#status.start( { 
             'rpcs': list['rpcs'], 
             'websockets': list['websockets'], 
-            filterStatus, 
+            onlyActive, 
             'source':'public' 
         } )
 
@@ -115,7 +115,7 @@ export class EvmNodes {
             'websockets': _private['websockets'].concat( _public['websockets'] )
         }
 
-        states = this.#sortByNetworkId( { states } )
+        states = this.#sortByNetworkId( { states, aliasAsKey } )
 
         return states
     }
@@ -128,18 +128,18 @@ export class EvmNodes {
  * @param {Object} options - Options for fetching nodes.
  * @param {Array<{ path: string, type: 'env' | 'script' }>} options.paths - An array of objects representing paths and their types.
  *   Each object should have a 'path' property (a string representing the file path) and a 'type' property (either 'env' or 'script').
- * @param {boolean} options.filterStatus - Whether to filter nodes by status.
+ * @param {boolean} options.onlyActive - Whether to filter nodes by status.
  * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */
 
-    async getPrivateNodes( { paths=[], filterStatus=false } ) {
+    async getPrivateNodes( { paths=[], onlyActive=false } ) {
         const privatePaths = paths
         const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths } )
         printMessages( { messages, comments } )
 
         const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths } )
-        let states = await this.#status.start( { rpcs, websockets, filterStatus, 'source':'private' } )
+        let states = await this.#status.start( { rpcs, websockets, onlyActive, 'source':'private' } )
         states = this.#sortByNetworkId( { states } )
 
         return states
@@ -151,21 +151,21 @@ export class EvmNodes {
  *
  * @async
  * @param {Object} options - Options for fetching nodes.
- * @param {boolean} options.filterStatus - Whether to filter nodes by status.
+ * @param {boolean} options.onlyActive - Whether to filter nodes by status.
  * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */
 
-    async getPublicNodes( { filterStatus=false } ) {
+    async getPublicNodes( { onlyActive=false } ) {
         console.log( 'List' )
         const { rpcs, websockets } = await this.#lists.getPublicNodes()
-        let states = await this.#status.start( { rpcs, websockets, filterStatus, 'source':'public' } )
+        let states = await this.#status.start( { rpcs, websockets, onlyActive, 'source':'public' } )
         states = this.#sortByNetworkId( { states } )
         return states
     }
 
 
-    #sortByNetworkId( { states } ) {
+    #sortByNetworkId( { states, aliasAsKey } ) {
         let result = [ 
             'rpcs', 
             'websockets' 
