@@ -74,9 +74,9 @@ This method combines `.getPrivateNode()` and `.getPublicNode()` and returns a re
 
 | Key           | Type   | Description                                         | Required |
 | ------------- | ------ | --------------------------------------------------- | -------- |
-| privatePaths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | true     |
-| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | false |
-| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | false |
+| privatePaths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | ``true`     |
+| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
+| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
 
 **Method**  
 ```js
@@ -108,9 +108,9 @@ This method creates a list from various files and then determines the status of 
 
 | Key           | Type   | Description                                         | Required |
 | ------------- | ------ | --------------------------------------------------- | -------- |
-| paths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | true     |
-| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | false |
-| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | false |
+| paths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | `true`     |
+| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
+| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
 
 **Method**  
 ```js
@@ -140,8 +140,8 @@ This method searches for current public Nodes through publicly available [lists]
 
 | Key           | Type   | Description                                         | Required |
 | ------------- | ------ | --------------------------------------------------- | -------- |
-| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | false |
-| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | false |
+| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
+| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
 
 
 **Method**  
