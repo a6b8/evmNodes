@@ -52,13 +52,13 @@ This module
 ```
 1 Private Lists*    Public Lists*
      |                    |
-2     ------ Merge* -------
-               |
-3 ---------- Analysis -----------             
+2     ------- Merge* ------
+                |
+3 ---------- Analysis ----------             
   |  getStatus, connectionTime |
-  |     isArchive, version     |
+  |  isArchive, clientVersion  |
   ------------------------------
-               |
+                |
 4 ----------- Output -----------
   |    lvl1: sort by status    |
   |   lvl2: sort by key/alias  |
@@ -90,7 +90,7 @@ import { EvmNodes } from './../src/EvmNodes.mjs'
 const evnNodes = new EvmNodes()
 const states = await evnNodes.getNodes( {
     'privatePaths': [ 
-        { 'path': './tests/.example-env', 'type': 'env' }
+        { 'path': './tests/.example-env', 'parser': 'env' }
     ],
     'onlyActive': true,
     'aliasAsKey': true
@@ -124,7 +124,7 @@ import { EvmNodes } from './../src/EvmNodes.mjs'
 const evnNodes = new EvmNodes()
 const states = await evnNodes.getPrivateNodes( {
     'paths': [ 
-        { 'path': './tests/.example-env', 'type': 'env' }
+        { 'path': './tests/.example-env', 'parser': 'env' }
     ]
 } )
 ```
@@ -200,6 +200,7 @@ Output
                     {
                         'url': string,
                         'timeInMs': number,
+                        'clientVersion': string,
                         'source': string
                     },
                     ... 
@@ -208,6 +209,7 @@ Output
                     {
                         'url': string,
                         'timeInMs': number,
+                        'clientVersion': string,
                         'source': string
                     },
                     ... 
@@ -216,6 +218,7 @@ Output
                     {
                         'url': string,
                         'timeInMs': number,
+                        'clientVersion': string,
                         'source': string
                     },
                     ...
@@ -227,7 +230,8 @@ Output
         { 
             'url': string,
             'source': string
-        }
+        },
+        ...
     ]
 }
 ```

@@ -30,11 +30,7 @@ export const config = {
         },
     },
     'lists': {
-        'types': [ 'env', 'script' ],
-        'regex': {
-            'rpcs': /https?:\/\/[^\s/$.?#].[^\s]*/g,
-            'websockets': /wss:\/\/[^\s/$.?#].[^\s]*/g
-        },
+        'parserTypes': [ 'env', 'script' ],
         'chainId': {
             'url': 'https://chainid.network/chains.json'
         },

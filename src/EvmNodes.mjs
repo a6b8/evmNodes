@@ -87,9 +87,10 @@ export class EvmNodes {
  *
  * @async
  * @param {Object} options - Options for fetching nodes.
- * @param {Array<{ path: string, type: 'env' | 'script' }>} options.paths - An array of objects representing paths and their types.
- *   Each object should have a 'path' property (a string representing the file path) and a 'type' property (either 'env' or 'script').
+ * @param {Array<{ path: string, parser: 'env' | 'script' }>} options.paths - An array of objects representing paths and their types.
+ *   Each object should have a 'path' property (a string representing the file path) and a 'parser' property (either 'env' or 'script').
  * @param {boolean} options.onlyActive - Whether to filter nodes by status.
+ * @param {boolean} options.aliasAsKey - Switch key from networkId to aliasName if available.
  * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */
@@ -126,21 +127,22 @@ export class EvmNodes {
  *
  * @async
  * @param {Object} options - Options for fetching nodes.
- * @param {Array<{ path: string, type: 'env' | 'script' }>} options.paths - An array of objects representing paths and their types.
- *   Each object should have a 'path' property (a string representing the file path) and a 'type' property (either 'env' or 'script').
+ * @param {Array<{ path: string, parser: 'env' | 'script' }>} options.paths - An array of objects representing paths and their types.
+ *   Each object should have a 'path' property (a string representing the file path) and a 'parser' property (either 'env' or 'script').
  * @param {boolean} options.onlyActive - Whether to filter nodes by status.
+ * @param {boolean} options.aliasAsKey - Switch key from networkId to aliasName if available.
  * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */
 
-    async getPrivateNodes( { paths=[], onlyActive=false } ) {
+    async getPrivateNodes( { paths=[], onlyActive=false, aliasAsKey=false } ) {
         const privatePaths = paths
         const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths } )
         printMessages( { messages, comments } )
 
         const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths } )
         let states = await this.#status.start( { rpcs, websockets, onlyActive, 'source':'private' } )
-        states = this.#sortByNetworkId( { states } )
+        states = this.#sortByNetworkId( { states, aliasAsKey } )
 
         return states
     }
@@ -152,15 +154,19 @@ export class EvmNodes {
  * @async
  * @param {Object} options - Options for fetching nodes.
  * @param {boolean} options.onlyActive - Whether to filter nodes by status.
+ * @param {boolean} options.aliasAsKey - Switch key from networkId to aliasName if available.
  * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */
 
-    async getPublicNodes( { onlyActive=false } ) {
+    async getPublicNodes( { onlyActive=false, aliasAsKey=false } ) {
+        const[ messages, comments ] = this.#validateGetPublicNodes( { onlyActive, aliasAsKey } )
+        printMessages( { messages, comments } )
+
         console.log( 'List' )
         const { rpcs, websockets } = await this.#lists.getPublicNodes()
         let states = await this.#status.start( { rpcs, websockets, onlyActive, 'source':'public' } )
-        states = this.#sortByNetworkId( { states } )
+        states = this.#sortByNetworkId( { states, aliasAsKey } )
         return states
     }
 
@@ -258,7 +264,7 @@ export class EvmNodes {
     }
 
 
-    #validateGetPrivateNodes( { privatePaths } ) {
+    #validateGetPrivateNodes( { privatePaths, onlyActive, aliasAsKey } ) {
         const messages = []
         const comments = []
 
@@ -295,15 +301,47 @@ export class EvmNodes {
                     messages.push( `[${index}] Item with the value '${item['path']}' does not exist.` )
                 }
                 
-                if( !Object.hasOwn( item, 'type' ) ) {
-                    messages.push( `[${index}] Item has no key 'type'.` )
+                if( !Object.hasOwn( item, 'parser' ) ) {
+                    messages.push( `[${index}] Item has no key 'parser'.` )
                     return true
-                } else if( !this.#config['lists']['types'].includes( item['type'] ) ) {
-                    messages.push( `[${index}] Item has an unknown type '${item['type']}'. Choose from ${this.#config['lists']['types'].map( a => `'${a}'`).join( ', ' )} instead.` )
+                } else if( !this.#config['lists']['parserTypes'].includes( item['parser'] ) ) {
+                    messages.push( `[${index}] Item has an unknown type '${item['parser']}'. Choose from ${this.#config['lists']['types'].map( a => `'${a}'`).join( ', ' )} instead.` )
                 }
             } )
 
+        if( onlyActive === undefined ) {
+            messages.push( `Key 'onlyActive' is undefined.` )
+        } else if( typeof onlyActive !== 'boolean' ) {
+            messages.push( `Key 'onlyActive' is not type of 'boolean'.` )
+        }
+
+        if( aliasAsKey === undefined ) {
+            messages.push( `Key 'aliasAsKey' is undefined.` )
+        }   else if( typeof aliasAsKey !== 'boolean' ) {
+            messages.push( `Key 'aliasAsKey' is not type of 'boolean'.` )
+        }
+
         return [ messages, comments ]
+    }
+
+
+    #validateGetPublicNodes( { onlyActive, aliasAsKey } ) {
+        const messages = []
+        const comments = []
+
+        if( onlyActive === undefined ) {
+            messages.push( `Key 'onlyActive' is undefined.` )
+        } else if( typeof onlyActive !== 'boolean' ) {
+            messages.push( `Key 'onlyActive' is not type of 'boolean'.` )
+        }
+
+        if( aliasAsKey === undefined ) {
+            messages.push( `Key 'aliasAsKey' is undefined.` )
+        }   else if( typeof aliasAsKey !== 'boolean' ) {
+            messages.push( `Key 'aliasAsKey' is not type of 'boolean'.` )
+        }
+
+        return true
     }
 
 

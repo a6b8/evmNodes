@@ -24,11 +24,11 @@ export class Lists {
         const [ rpcs, websockets ] = privatePaths
             .reduce( ( acc, item, index ) => {
                 try {
-                    const { path, type } = item
+                    const { path, parser } = item
                     const data = fs.readFileSync( path, 'utf-8' )
 
                     let result
-                    switch( type ) {
+                    switch( parser ) {
                         case 'env':
                             result = this.#findUrlsInEnv( { data } )
                             break
