@@ -97,18 +97,19 @@ export class EvmNodes {
  * @throws {Error} If there is an issue fetching the nodes.
  */
 
-    async getNodes( { privatePaths=[], onlyActive=false, aliasAsKey=false } ) {
-        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths, onlyActive, aliasAsKey } )
+    async getNodes( { privatePaths=[], onlyActive=false, aliasAsKey=true, useRpcs=true, useWebsockets=true } ) {
+        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths, onlyActive, aliasAsKey, useRpcs, useWebsockets } )
         printMessages( { messages, comments } )
 
-        const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths } )
+        const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths, useRpcs, useWebsockets } )
         let _private = await this.#status.start( { rpcs, websockets, onlyActive, 'source':'private' } )
 
-        const list = await this.#lists.getPublicNodes()
+        this.#status.init()
+        const list = await this.#lists.getPublicNodes( { useRpcs, useWebsockets } )
 
         let _public = await this.#status.start( { 
-            'rpcs': list['rpcs'], 
-            'websockets': list['websockets'], 
+            'rpcs': list[ 0 ], 
+            'websockets': list[ 1], 
             onlyActive, 
             'source':'public' 
         } )
@@ -137,12 +138,12 @@ export class EvmNodes {
  * @throws {Error} If there is an issue fetching the nodes.
  */
 
-    async getPrivateNodes( { paths=[], onlyActive=false, aliasAsKey=false } ) {
+    async getPrivateNodes( { paths=[], onlyActive=false, aliasAsKey=true, useRpcs=true, useWebsockets=true } ) {
         const privatePaths = paths
-        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths, onlyActive, aliasAsKey } )
+        const [ messages, comments ] = this.#validateGetPrivateNodes( { privatePaths, onlyActive, aliasAsKey, useRpcs, useWebsockets } )
         printMessages( { messages, comments } )
 
-        const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths } )
+        const [ rpcs, websockets ] = await this.#lists.getPrivateNodes( { privatePaths, useRpcs, useWebsockets } )
         let states = await this.#status.start( { rpcs, websockets, onlyActive, 'source':'private' } )
         states = this.#sortByNetworkId( { states, aliasAsKey } )
 
@@ -161,11 +162,11 @@ export class EvmNodes {
  * @throws {Error} If there is an issue fetching the nodes.
  */
 
-    async getPublicNodes( { onlyActive=false, aliasAsKey=false } ) {
-        const[ messages, comments ] = this.#validateGetPublicNodes( { onlyActive, aliasAsKey } )
+    async getPublicNodes( { onlyActive=false, aliasAsKey=true, useRpcs=true, useWebsockets=true } ) {
+        const[ messages, comments ] = this.#validateGetPublicNodes( { onlyActive, aliasAsKey, useRpcs, useWebsockets } )
         printMessages( { messages, comments } )
 
-        const { rpcs, websockets } = await this.#lists.getPublicNodes()
+        const [ rpcs, websockets ] = await this.#lists.getPublicNodes( { useRpcs, useWebsockets } )
         let states = await this.#status.start( { rpcs, websockets, onlyActive, 'source':'public' } )
         states = this.#sortByNetworkId( { states, aliasAsKey } )
         return states
@@ -239,7 +240,8 @@ export class EvmNodes {
                 return acc
             }, {} )
 
-        result['active'] = Object.keys( result['active'] )
+        result['active'] = Object
+            .keys( result['active'] )
             .map( a => parseInt( a ) )
             .sort( ( a, b ) => a - b )
             .reduce( ( acc, a, index ) => {
@@ -254,6 +256,23 @@ export class EvmNodes {
 
                 return acc
             }, {} )
+
+        if( aliasAsKey ) {
+            result['active'] = Object
+                .entries( result['active'] )
+                .reduce( ( acc, a, index ) => {
+                    const [ key, value ] = a
+                    const { alias } = value
+                    delete value['alias']
+
+                    const result = { 
+                        'networkId': key, 
+                        ...value  
+                    }
+                    acc[ alias ] = result
+                    return acc
+                }, {} )
+        }
 
         result['inactive'] = result['inactive']
             .map( a => {
@@ -274,7 +293,7 @@ export class EvmNodes {
     }
 
 
-    #validateGetPrivateNodes( { privatePaths, onlyActive, aliasAsKey } ) {
+    #validateGetPrivateNodes( { privatePaths, onlyActive, aliasAsKey, useRpcs, useWebsockets } ) {
         const messages = []
         const comments = []
 
@@ -319,37 +338,43 @@ export class EvmNodes {
                 }
             } )
 
-        if( onlyActive === undefined ) {
-            messages.push( `Key 'onlyActive' is undefined.` )
-        } else if( typeof onlyActive !== 'boolean' ) {
-            messages.push( `Key 'onlyActive' is not type of 'boolean'.` )
-        }
-
-        if( aliasAsKey === undefined ) {
-            messages.push( `Key 'aliasAsKey' is undefined.` )
-        }   else if( typeof aliasAsKey !== 'boolean' ) {
-            messages.push( `Key 'aliasAsKey' is not type of 'boolean'.` )
-        }
+        const tmp = [
+            [ onlyActive, 'onlyActive' ],
+            [ aliasAsKey, 'aliasAsKey' ],
+            [ useRpcs, 'useRpcs' ],
+            [ useWebsockets, 'useWebsockets' ]
+        ]
+            .forEach( ( a, index ) => {
+                const [ value, key ] = a
+                if( value === undefined ) {
+                    messages.push( `Key '${key}' is undefined.` )
+                } else if( typeof value !== 'boolean' ) {
+                    messages.push( `Key '${key}' is not type of 'boolean'.` )
+                }
+            } )
 
         return [ messages, comments ]
     }
 
 
-    #validateGetPublicNodes( { onlyActive, aliasAsKey } ) {
+    #validateGetPublicNodes( { onlyActive, aliasAsKey, useRpcs, useWebsockets } ) {
         const messages = []
         const comments = []
 
-        if( onlyActive === undefined ) {
-            messages.push( `Key 'onlyActive' is undefined.` )
-        } else if( typeof onlyActive !== 'boolean' ) {
-            messages.push( `Key 'onlyActive' is not type of 'boolean'.` )
-        }
-
-        if( aliasAsKey === undefined ) {
-            messages.push( `Key 'aliasAsKey' is undefined.` )
-        }   else if( typeof aliasAsKey !== 'boolean' ) {
-            messages.push( `Key 'aliasAsKey' is not type of 'boolean'.` )
-        }
+        const tmp = [
+            [ onlyActive, 'onlyActive' ],
+            [ aliasAsKey, 'aliasAsKey' ],
+            [ useRpcs, 'useRpcs' ],
+            [ useWebsockets, 'useWebsockets' ]
+        ]
+            .forEach( ( a, index ) => {
+                const [ value, key ] = a
+                if( value === undefined ) {
+                    messages.push( `Key '${key}' is undefined.` )
+                } else if( typeof value !== 'boolean' ) {
+                    messages.push( `Key '${key}' is not type of 'boolean'.` )
+                }
+            } )
 
         return [ messages, comments ]
     }

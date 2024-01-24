@@ -20,7 +20,7 @@ export class Lists {
     }
 
 
-    async getPrivateNodes( { privatePaths } ) {
+    async getPrivateNodes( { privatePaths, useRpcs, useWebsockets } ) {
         const [ rpcs, websockets ] = privatePaths
             .reduce( ( acc, item, index ) => {
                 try {
@@ -47,11 +47,12 @@ export class Lists {
                 return acc
             }, [ [], [] ] )
 
-        return [ rpcs, websockets ]
+        const result = this.#addFilter( { rpcs, useRpcs, websockets, useWebsockets } )
+
+        return result
     }
 
-
-    async getPublicNodes() {
+    async getPublicNodes( { useRpcs, useWebsockets }) {
         const [ a, b ] = await this.#getChainList()
         const [ c, d ] = await this.#getChainId()
 
@@ -67,7 +68,20 @@ export class Lists {
                 return acc
             }, {} )
 
-        return datas
+        const { rpcs, websockets } = datas
+        const result = this.#addFilter( { rpcs, useRpcs, websockets, useWebsockets } )
+
+        return result
+    }
+
+
+    #addFilter( { rpcs, useRpcs, websockets, useWebsockets } ) {
+        const result = [
+            useRpcs ? rpcs : [],
+            useWebsockets ? websockets : []
+        ]
+
+        return result
     }
 
 

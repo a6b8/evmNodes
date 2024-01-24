@@ -38,18 +38,34 @@ export class CLI {
             console.log( '' )
         }
 
+        const msg_before = 'Add Filter'
+        const msgColorBefore = chalk.green( msg_before )
+        console.log( msgColorBefore )
+        const { useRpcs, useWebsockets } = await this.#addFilter()
+        console.log( '' )
+
         const msg = 'Choose options'
         const msgColor = chalk.green( msg )
         console.log( msgColor )
         const { onlyActive, aliasAsKey } = await this.#addOptions() 
+        console.log( '' )
+
+
+        const msg_after = 'Output'
+        const msgColorAfter = chalk.green( msg_after )
+        console.log( msgColorAfter )
+
         const { filePath } = await this.#addFilePath()
         const struct = {
             type,
             'params': {
                 paths,
                 onlyActive,
-                aliasAsKey
-            }
+                aliasAsKey,
+                useRpcs,
+                useWebsockets
+            },
+            filePath
         }
 
         type === 'Public' ? delete struct['params']['paths'] : null
@@ -67,20 +83,26 @@ export class CLI {
                 result = await this.#evmNodes.getPrivateNodes( {
                     paths,
                     onlyActive,
-                    aliasAsKey
+                    aliasAsKey,
+                    useRpcs,
+                    useWebsockets
                 } )
                 break
             case 'Public':
                 result = await this.#evmNodes.getPublicNodes( {
                     onlyActive,
-                    aliasAsKey
+                    aliasAsKey,
+                    useRpcs,
+                    useWebsockets
                 } )   
                 break
             case 'Both':
                 result = await this.#evmNodes.getNodes( {
                     'privatePaths': paths,
                     onlyActive,
-                    aliasAsKey
+                    aliasAsKey,
+                    useRpcs,
+                    useWebsockets
                 } )
                 break
             default:
@@ -102,8 +124,32 @@ export class CLI {
     }
 
 
+    async #addFilter() {
+        // ask 2 diffrent questions
+        // 1. Do you want to include RPCs Nodes? Y/n
+        // 2. Do you want to include Websocket Nodes? Y/n
+
+        const response = await inquirer.prompt( [
+            {
+                'type': 'confirm',
+                'name': 'useRpcs',
+                'message': 'Do you want to include RPCs Nodes?',
+                'default': true
+            },
+            {
+                'type': 'confirm',
+                'name': 'useWebsockets',
+                'message': 'Do you want to include Websocket Nodes?',
+                'default': true
+            }
+        ] )
+
+        return response
+    }
+
+
     async #addFilePath() {
-        const response = await inquirer.prompt([
+        const response = await inquirer.prompt( [
             {
                 'type': 'input',
                 'name': 'filePath',
@@ -127,6 +173,7 @@ export class CLI {
         console.log( chalk.green( 'Is this data correct?' ) )
         console.log( `${chalk.yellow( 'List:' )} ${chalk.white( struct['type'] )}` )
         console.log( `${chalk.yellow( 'Options:' )} ${JSON.stringify( struct['params'], null, 4 )}` )
+        console.log( `${chalk.yellow( 'Output Path:' )} ${struct['filePath']}` )
 
         const response = await inquirer.prompt( [
             {
@@ -213,7 +260,7 @@ export class CLI {
                 'type': 'confirm',
                 'name': 'aliasAsKey',
                 'message': 'Should the key to a network named by networkId or alias?',
-                'default': false
+                'default': true
             }
         ] )
 

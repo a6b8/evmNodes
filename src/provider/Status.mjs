@@ -12,6 +12,12 @@ export class Status {
 
     constructor( { status, alias }) {
         this.#config = { status, alias }
+        this.init()
+        return true
+    }
+
+
+    init() {
         this.#progress = {
             'total': 0,
             'done': 0,
@@ -21,8 +27,6 @@ export class Status {
             'isArchive': new Set(),
             'nonce': 0
         }
-
-        return true
     }
 
 
@@ -52,7 +56,11 @@ export class Status {
 
         states['rpcs'] = rpcData
         states['websockets'] = websocketData    
-        this.#readline.close()
+
+        if( this.#readline !== undefined ) {
+            this.#printStatus( { 'status': true, source } )
+            this.#readline.close()
+        }
         
         return states
     }
@@ -83,7 +91,7 @@ export class Status {
 
                     if( struct['status'] === true ) {
                         struct['status'] ? this.#progress['websockets'].add( url ) : null
-                        this.#printStatus( { 'status': struct['status'] } )
+                        this.#printStatus( { 'status': struct['status'], source } )
                     }
 
                     return struct
@@ -128,7 +136,7 @@ export class Status {
                     }
 
                     status ? this.#progress['rpcs'].add( url ) : null
-                    this.#printStatus( { 'status': status } )
+                    this.#printStatus( { 'status': status, source } )
  
                     return struct
                 } ) 
@@ -251,25 +259,18 @@ export class Status {
             if( response['status'] !== true ) {
             } else if( Object.hasOwn( response['data'], 'result' ) ) {
                 if( Array.isArray( response['data']['result'] ) ) {
-                    // console.log( response['data']['result'].length )
                     if( response['data']['result'].length === 0 ) {
-                        // result['message'] = 'No results found'
                     } else {
                         result['status'] = true
                         result['isArchive'] = true
-                        // result['message'] = `Success! (${response['data']['result'].length} Logs found)`
                     }
                 } else {
-                    // result['message'] = 'Result is not Array'
                 }
             } else if( Object.hasOwn( response['data'], 'error' ) ) {
                 if( Object.hasOwn( response['data']['error'], 'message' ) ) {
-                    // result['message'] = `${response['data']['error']['message']}`
                 } else {
-                    // result['message'] = `Request`
                 }
             } else {
-                // result['message'] = `Unknown error`
             }
         } catch( e ) {
         }
@@ -340,7 +341,7 @@ export class Status {
     }
 
 
-    #printStatus( { status } ) {
+    #printStatus( { status, source } ) {
         if( this.#progress['nonce'] === 0 ) {
             this.#readline = readline.createInterface( {
                 'input': process.stdin,
@@ -398,7 +399,7 @@ export class Status {
                 websockets += `Websockets`
 
                 const _percent = Math.floor( ( this.#progress['done'] * 100 ) / this.#progress['total'] )
-                this.#readline.write( `${_percent}% (${s}) | ${_time} | ${rpc} | ${websockets}`  )
+                this.#readline.write( `${source}: ${_percent}% (${s}) | ${_time} | ${rpc} | ${websockets}`  )
             }
         }
 
