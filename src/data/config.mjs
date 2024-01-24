@@ -6,7 +6,7 @@ export const config = {
             'thresholdInMs': 3000
         },
         'websockets': {
-            'chunkSize': 20,
+            'chunkSize': 10,
             'thresholdInMs': 3000
         },
         'requests': {

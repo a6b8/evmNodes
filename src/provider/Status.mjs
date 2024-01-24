@@ -13,6 +13,9 @@ export class Status {
     constructor( { status }) {
         this.#config = { status }
         this.#progress = {
+            'total': 0,
+            'done': 0,
+            'startDate': new Date(),
             'rpcs': new Set(),
             'websockets': new Set(),
             'isArchive': new Set(),
@@ -22,6 +25,7 @@ export class Status {
 
 
     async start( { rpcs, websockets, onlyActive, source } ) {
+        this.#progress['total'] = rpcs.length + websockets.length
         this.#state = { onlyActive }
 
         const chunks = this.#groupingUrls( { rpcs, websockets } )
@@ -46,8 +50,8 @@ export class Status {
 
         states['rpcs'] = rpcData
         states['websockets'] = websocketData    
-        // this.#readline.close()
-
+        this.#readline.close()
+        
         return states
     }
 
@@ -57,6 +61,7 @@ export class Status {
         for( const chunk of chunks ) {
             const result = await Promise.all( 
                 chunk.map( async url => {
+                    this.#progress['done']++
                     const struct = {}
 
                     let resp
@@ -98,6 +103,7 @@ export class Status {
         for( const chunk of chunks ) {
             const result = await Promise.all( 
                 chunk.map( async url => {
+                    this.#progress['done']++
                     const { status, networkId, timeInMs } = await this.#getRpcStatus( { url } )
 
                     const struct = {
@@ -342,14 +348,58 @@ export class Status {
 
         if( status ) {
             this.#progress['nonce']++
-            if( this.#progress['nonce'] % 5 === 0 || this.#progress['nonce'] === 1 ) {
+            if( this.#progress['nonce'] % 2 === 0 || this.#progress['nonce'] === 1 ) {
                 process.stdout.clearLine( 0 )
                 process.stdout.cursorTo( 0 )
-                this.#readline.write(null, { ctrl: true, name: 'u' });
+                this.#readline.write( null, { ctrl: true, name: 'u' } )
 
-                let currentString = `${this.#progress['rpcs'].size}, ${this.#progress['websockets'].size}, ${this.#progress['isArchive'].size}`
-                this.#readline.write(currentString)
+                const strs = [
+                    [ this.#progress['rpcs'].size, 'LightNodes' ],
+                    [ this.#progress['isArchive'].size, 'ArchiveNodes' ],
+                    [ this.#progress['websockets'].size, 'Websockets' ]
+                ]
+                    .reduce( ( acc, a, index ) => {
+                        const [ size, name ] = a
+                        const _size = new Array( 4 - size.toString().length )
+                            .fill( ' ' )
+                            .join( '' )
+                        const _websockets = new Array( 14 - name.length )
+                            .fill( ' ' )
+                            .join( '' )
+                        
+                        const str = `${_size} ${size} ${name}${_websockets}`
+                        acc += str
+                        return acc
+                    }, '' )
 
+
+                const s = [
+                    this.#progress['done'],
+                    this.#progress['total']
+                ]
+                    .join( '/' )
+
+
+                const currentTime = new Date()
+                const timeDiff = currentTime - this.#progress['startDate']
+                const minutes = Math.floor( timeDiff / 60000 )
+                const seconds = Math.floor( ( timeDiff % 60000) / 1000 )
+                const _time = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+
+                let rpc = ''
+                rpc += `${this.#progress['rpcs'].size + this.#progress['isArchive'].size} `
+                rpc += `(${this.#progress['rpcs'].size}|${this.#progress['isArchive'].size}) `
+                rpc += `Rpcs`
+
+                let websockets = ''
+                websockets += `${this.#progress['websockets'].size} `
+                websockets += `Websockets`
+
+
+                const _percent = Math.floor( ( this.#progress['done'] * 100 ) / this.#progress['total'] )
+
+                this.#readline.write( `${_percent}% (${s}) | ${_time} | ${rpc} | ${websockets}`  )
             }
         }
 

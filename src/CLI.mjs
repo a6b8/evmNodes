@@ -2,6 +2,7 @@ import inquirer from 'inquirer'
 import figlet from 'figlet'
 import { EvmNodes } from './EvmNodes.mjs'
 import chalk from 'chalk'
+import fs from 'fs'
 
 
 export class CLI {
@@ -22,13 +23,13 @@ export class CLI {
     async start() {
         this.#addHeadline()
         await this.#startRoute()
-
         return true
     }
 
 
     async #startRoute() {
         const { type } = await this.#addChooseRoute()
+        console.log( '' )
 
         let paths = []
         if( type === 'Private' || type === 'Both' ) {
@@ -37,7 +38,11 @@ export class CLI {
             console.log( '' )
         }
 
+        const msg = 'Choose options'
+        const msgColor = chalk.green( msg )
+        console.log( msgColor )
         const { onlyActive, aliasAsKey } = await this.#addOptions() 
+        const { filePath } = await this.#addFilePath()
         const struct = {
             type,
             'params': {
@@ -56,22 +61,23 @@ export class CLI {
             console.log( '' )
         }
 
+        let result
         switch( type ) {
             case 'Private':
-                await this.#evmNodes.getPrivateNodes( {
+                result = await this.#evmNodes.getPrivateNodes( {
                     paths,
                     onlyActive,
                     aliasAsKey
                 } )
                 break
             case 'Public':
-                await this.#evmNodes.getPublicNodes( {
+                result = await this.#evmNodes.getPublicNodes( {
                     onlyActive,
                     aliasAsKey
                 } )   
                 break
             case 'Both':
-                await this.#evmNodes.getNodes( {
+                result = await this.#evmNodes.getNodes( {
                     'privatePaths': paths,
                     onlyActive,
                     aliasAsKey
@@ -82,6 +88,12 @@ export class CLI {
                 break
         }
 
+        if( !fs.existsSync( filePath ) ) {
+            fs.writeFileSync( filePath, JSON.stringify( result, null, 4 ), 'utf-8' )
+        } else {
+            console.log( 'Error: File already exists.' )
+        }
+
         return true
     }
 
@@ -90,12 +102,31 @@ export class CLI {
     }
 
 
+    async #addFilePath() {
+        const response = await inquirer.prompt([
+            {
+                'type': 'input',
+                'name': 'filePath',
+                'message': 'Enter the path to the file:',
+                'default': `node_${Math.floor(Date.now() / 1000)}.json`,
+                'validate': ( input ) => {
+                    if( fs.existsSync( input ) ) {
+                        return 'File already exists. Please choose a different name.'
+                    }
+                    return true
+                }
+            }
+        ] )
+
+        return response
+    }
+
+
     async #addConfirmation( { struct } ) {
         console.log()
         console.log( chalk.green( 'Is this data correct?' ) )
-        console.log()
-        console.log( `${chalk.green( 'List:' )} ${chalk.white( struct['type'] )}` )
-        console.log( `${chalk.green( 'Options:' )} ${JSON.stringify( struct['params'], null, 4 )}` )
+        console.log( `${chalk.yellow( 'List:' )} ${chalk.white( struct['type'] )}` )
+        console.log( `${chalk.yellow( 'Options:' )} ${JSON.stringify( struct['params'], null, 4 )}` )
 
         const response = await inquirer.prompt( [
             {
@@ -131,7 +162,6 @@ export class CLI {
 
 
     async #addPrivatePaths( { paths } )  {
-        console.log( '' )
         const msg = 'Add a private path:'
         const msgColor = chalk.green( msg )
         console.log( msgColor )
@@ -141,8 +171,17 @@ export class CLI {
                 'type': 'input',
                 'name': 'path',
                 'message': 'Enter the path to the file:',
-                'default': './.example-env'
-            },
+                'default': './.example-env',
+                'validate': function ( input ) {
+                    if( !fs.existsSync( input ) ) {
+                        return 'File does not exists. Please choose a path to an existing file.'
+                    } 
+                    return true
+                }
+            } 
+        ] )
+
+        const response2 = await inquirer.prompt( [
             {
                 'type': 'list',
                 'name': 'parser',
@@ -151,7 +190,8 @@ export class CLI {
             }
         ] )
 
-        const { path, parser } = response
+        const { path } = response
+        const { parser } = response2
         paths.push(  { path, parser } )
 
         return paths
@@ -182,7 +222,7 @@ export class CLI {
 
 
     async #addChooseRoute() {
-        const msg = 'Route'
+        const msg = 'Choose list type'
         const msgColor = chalk.green( msg )
         console.log( msgColor )
 
@@ -190,7 +230,7 @@ export class CLI {
             {
                 'type': 'list',
                 'name': 'type',
-                'message': 'Choose list type',
+                'message': 'Route',
                 'choices': [ 'Public', 'Private', 'Both' ],
             }
         ] )
