@@ -15,18 +15,47 @@ This module helps in checking the activity of lists of Evm Nodes. It simultaneou
 
 
 ## Quickstart
-This example shows how to query public Nodes.
 
-```js
+To use the module, both a Command Line Interface and the module itself is available.
+
+### Command Line Interface
+
+This example demonstrates how to install the CLI of the module.
+
+**terminal**
+```bash
+git clone https://github.com/a6b8/evmNodes.git
+cd evmNodes
+npm i
+npm link
+```
+
+```bash
+evmnodes
+```
+
+### Code
+
+This example shows how to query public Nodes with Node.js.
+
+**index.mjs**
+```javascript
 import { EvmNodes } from './../src/EvmNodes.mjs'
 const evnNodes = new EvmNodes()
 const states = await evnNodes.getPublicNodes({})
+```
+
+**terminal**
+```bash
+node index.mjs
 ```
 
 ## Table of Contents
 - [Evm Nodes](#evm-nodes)
   - [Features:](#features)
   - [Quickstart](#quickstart)
+    - [Command Line Interface](#command-line-interface)
+    - [Code](#code)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Methods](#methods)
@@ -36,6 +65,7 @@ const states = await evnNodes.getPublicNodes({})
       - [Example](#example-1)
     - [.getPublicNodes()](#getpublicnodes)
       - [Example](#example-2)
+  - [Command Line Interface](#command-line-interface-1)
   - [Alias Names](#alias-names)
   - [Output](#output)
   - [License](#license)
@@ -53,7 +83,7 @@ This module
 ```
 1 Private Lists*    Public Lists*
      |                    |
-2     ------- Merge* ------
+2     -- Filter* Merge* --
                 |
 3 ---------- Analysis ----------             
   |  getStatus, connectionTime |
@@ -169,12 +199,44 @@ const states = await evnNodes.getPublicNodes( {
 Object{}
 ```
 
+## Command Line Interface
+
+To ensure easier usage, a CLI version is available, covering **all** public methods of the module. Additionally, a path must be specified where the results will be output later. Currently, there is no NPM module available, so the repository must be downloaded first. Afterward, it can be made globally available using `npm link`. To undo this, you can use `npm unlink -g evmnodes`.
+
+To install:
+
+**terminal**
+```bash
+git clone https://github.com/a6b8/evmNodes.git
+cd evmNodes
+npm i
+npm link
+```
+
+```bash
+evmnodes
+```
+
+To uninstall:
+```
+npm unlink -g evmnodes
+```
+
+
 ## Alias Names
 
-Aliases are also used in the queries if available. The list can be found here: `./src/data/alias.mjs`. If a network is missing, you are welcome to contribute the missing information via a pull request.
+Aliases are also used in the queries if available. The list can be found here: `./src/data/alias.mjs`. This list includes more than 500 entries, each consisting of the `networkId`, `alias`, and a detailed name (`name`).
+
+The following rules were observed during creation:
+- The `alias` name serves as a unique ID, ensuring no duplications.
+- The name consists of two parts: 1. The network name, e.g., `ETHEREUM`, and the network type, e.g., `MAINNET`.
+- The main network is described as `MAINNET`. If not specified otherwise, the test network is labeled with the type `TESTNET`.
+- The name and type are separated by an underscore `_`. No other characters such as uppercase letters or numbers are allowed in names or types.
+
+> If a network is missing, you are welcome to contribute the missing information via a pull request.
 
 Example:
-```js
+```javascript
 const alias = {
     "1": {
         "alias": "ETHEREUM_MAINNET",

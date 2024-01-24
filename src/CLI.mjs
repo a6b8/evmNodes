@@ -98,7 +98,7 @@ export class CLI {
     }
 
     #addHeadline() {
-        console.log( figlet.textSync( 'EVM Nodes', { 'horizontalLayout': 'full' } ) )
+        console.log( figlet.textSync( 'EVM Nodes', { 'font': 'cybermedium', 'horizontalLayout': 'full' } ) )
     }
 
 
