@@ -256,7 +256,7 @@ const alias = {
 ## Output
 The structure is the same for all three methods. The results are divided into `active` and `inactive`. Whether `inactive` results are included can be optionally configured. In `active`, the individual networks are divided by `networkId`. This can optionally be changed to use the `alias` name with the `aliasAsKey` option.
 
-Output
+Default output (sort by `networkId`):
 ```js
 {
     'active: {
