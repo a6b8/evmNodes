@@ -104,11 +104,17 @@ There are three public methods defined: `getPrivateNodes`, `getPublicNode`, and 
 
 This method combines `.getPrivateNode()` and `.getPublicNode()` and returns a result.
 
-| Key           | Type   | Description                                         | Required |
-| ------------- | ------ | --------------------------------------------------- | -------- |
-| privatePaths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | `true`     |
-| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
-| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
+Um eine weitere Spalte mit dem Namen "default" hinzuzufügen, kannst du die Markdown-Tabelle entsprechend bearbeiten. Hier ist die aktualisierte Tabelle:
+
+| Key           | Type            | Default | Description                                         | Required |
+| ------------- | --------------- | ------- | --------------------------------------------------- | -------- |
+| privatePaths  | Array of Object |         | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | `true`  |
+| onlyActive    | Boolean         | `false` | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
+| aliasAsKey    | Boolean         | `true`  | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
+| useRpcs       | Boolean         | `true`  | Whether to use RPCs for fetching nodes. | `false` |
+| useWebsockets | Boolean         | `true`  | Whether to use Websockets for fetching nodes. | `false` |
+
+Die Spalte "Default" wurde hinzugefügt, aber die Werte für die Default-Einstellungen fehlen. Du kannst die Werte in der Tabelle entsprechend ergänzen.
 
 **Method**  
 ```js
@@ -138,11 +144,13 @@ Object{}
 
 This method creates a list from various files and then determines the status of each URL.
 
-| Key           | Type   | Description                                         | Required |
-| ------------- | ------ | --------------------------------------------------- | -------- |
-| paths     | Array of Object | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | `true`     |
-| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
-| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
+| Key           | Type            | Default | Description                                         | Required |
+| ------------- | --------------- | ------- | --------------------------------------------------- | -------- |
+| paths  | Array of Object |         | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | `true`  |
+| onlyActive    | Boolean         | `false` | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
+| aliasAsKey    | Boolean         | `true`  | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
+| useRpcs       | Boolean         | `true`  | Whether to use RPCs for fetching nodes. | `false` |
+| useWebsockets | Boolean         | `true`  | Whether to use Websockets for fetching nodes. | `false` |
 
 **Method**  
 ```js
@@ -172,10 +180,12 @@ Object{}
 
 This method searches for current public Nodes through publicly available [lists](https://github.com/a6b8/evmProviders/blob/a5533c544bc9668ac94e1305208931dd28b06dd5/src/data/config.mjs#L32).
 
-| Key           | Type   | Description                                         | Required |
-| ------------- | ------ | --------------------------------------------------- | -------- |
-| onlyActive | Boolean | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
-| aliasAsKey | Boolean | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
+| Key           | Type            | Default | Description                                         | Required |
+| ------------- | --------------- | ------- | --------------------------------------------------- | -------- |
+| onlyActive    | Boolean         | `false` | Determines whether the inactive Nodes should also be listed in the 'inactive' section of the result. | `false` |
+| aliasAsKey    | Boolean         | `true`  | By default, the `active` results are sorted by `networkId`, but this can be changed to `alias` with this method. If no alias is specified, `UNKNOWN_${{networkId}}` is used. | `false` |
+| useRpcs       | Boolean         | `true`  | Whether to use RPCs for fetching nodes. | `false` |
+| useWebsockets | Boolean         | `true`  | Whether to use Websockets for fetching nodes. | `false` |
 
 
 **Method**  

@@ -89,11 +89,13 @@ export class EvmNodes {
  *
  * @async
  * @param {Object} options - Options for fetching nodes.
- * @param {Array<{ path: string, parser: 'env' | 'script' }>} options.paths - An array of objects representing paths and their types.
+ * @param {Array<{ path: string, parser: 'env' | 'script' }>} options.privatePaths - An array of objects representing private paths and their types.
  *   Each object should have a 'path' property (a string representing the file path) and a 'parser' property (either 'env' or 'script').
  * @param {boolean} options.onlyActive - Whether to filter nodes by status.
  * @param {boolean} options.aliasAsKey - Switch key from networkId to aliasName if available.
- * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
+ * @param {boolean} options.useRpcs - Whether to use RPCs for fetching nodes (default is true).
+ * @param {boolean} options.useWebsockets - Whether to use Websockets for fetching nodes (default is true).
+ * @returns {Promise<GetNodesResponse>} A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */
 
@@ -134,6 +136,8 @@ export class EvmNodes {
  *   Each object should have a 'path' property (a string representing the file path) and a 'parser' property (either 'env' or 'script').
  * @param {boolean} options.onlyActive - Whether to filter nodes by status.
  * @param {boolean} options.aliasAsKey - Switch key from networkId to aliasName if available.
+ * @param {boolean} options.useRpcs - Whether to use RPCs for fetching nodes (default is true).
+ * @param {boolean} options.useWebsockets - Whether to use Websockets for fetching nodes (default is true).
  * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */
@@ -158,6 +162,8 @@ export class EvmNodes {
  * @param {Object} options - Options for fetching nodes.
  * @param {boolean} options.onlyActive - Whether to filter nodes by status.
  * @param {boolean} options.aliasAsKey - Switch key from networkId to aliasName if available.
+ * @param {boolean} options.useRpcs - Whether to use RPCs for fetching nodes (default is true).
+ * @param {boolean} options.useWebsockets - Whether to use Websockets for fetching nodes (default is true).
  * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */
