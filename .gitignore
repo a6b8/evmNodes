@@ -2,3 +2,4 @@ node_modules
 index.mjs
 test.json
 here.json
+/node*.json
