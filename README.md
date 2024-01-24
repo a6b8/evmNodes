@@ -201,6 +201,18 @@ Object{}
 
 ## Command Line Interface
 
+```
+____ _  _ _  _    _  _ ____ ___  ____ ____ 
+|___ |  | |\/|    |\ | |  | |  \ |___ [__  
+|___  \/  |  |    | \| |__| |__/ |___ ___] 
+                                           
+Choose list type
+? Route (Use arrow keys)
+❯ Public 
+  Private 
+  Both 
+```
+
 To ensure easier usage, a CLI version is available, covering **all** public methods of the module. Additionally, a path must be specified where the results will be output later. Currently, there is no NPM module available, so the repository must be downloaded first. Afterward, it can be made globally available using `npm link`. To undo this, you can use `npm unlink -g evmnodes`.
 
 To install:
