@@ -10,8 +10,8 @@ export class Status {
     #readline
 
 
-    constructor( { status }) {
-        this.#config = { status }
+    constructor( { status, alias }) {
+        this.#config = { status, alias }
         this.#progress = {
             'total': 0,
             'done': 0,
@@ -21,6 +21,8 @@ export class Status {
             'isArchive': new Set(),
             'nonce': 0
         }
+
+        return true
     }
 
 
@@ -386,7 +388,6 @@ export class Status {
                 const seconds = Math.floor( ( timeDiff % 60000) / 1000 )
                 const _time = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-
                 let rpc = ''
                 rpc += `${this.#progress['rpcs'].size + this.#progress['isArchive'].size} `
                 rpc += `(${this.#progress['rpcs'].size}|${this.#progress['isArchive'].size}) `
@@ -396,9 +397,7 @@ export class Status {
                 websockets += `${this.#progress['websockets'].size} `
                 websockets += `Websockets`
 
-
                 const _percent = Math.floor( ( this.#progress['done'] * 100 ) / this.#progress['total'] )
-
                 this.#readline.write( `${_percent}% (${s}) | ${_time} | ${rpc} | ${websockets}`  )
             }
         }

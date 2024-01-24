@@ -1,4 +1,8 @@
 export const config = {
+    'alias': {
+        'unknown': 'UNKNOWN',
+        'spliter': '_'
+    },
     'status': {
         'timeoutInMs': 5000,
         'rpcs': {

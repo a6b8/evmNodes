@@ -76,7 +76,8 @@ export class EvmNodes {
             'lists': this.#config['lists']
         })
         this.#status = new Status({ 
-            'status': this.#config['status']
+            'status': this.#config['status'],
+            'alias': this.#config['alias']
         } )
 
         return true
@@ -202,6 +203,11 @@ export class EvmNodes {
         
                             if( Object.hasOwn( alias, id ) ) {
                                 acc['active'][ networkId ]['alias'] = alias[ id ]['alias']
+                            } else {
+                                acc['active'][ networkId ]['alias'] = ''
+                                acc['active'][ networkId ]['alias'] += this.#config['alias']['unknown'] 
+                                acc['active'][ networkId ]['alias'] += this.#config['alias']['splitter'] 
+                                acc['active'][ networkId ]['alias'] += networkId 
                             }
                         }
 
