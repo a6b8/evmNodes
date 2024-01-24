@@ -2,7 +2,7 @@
 
 # Evm Nodes
 
-This module helps in checking the activity of lists of Evm Nodes. It simultaneously queries the `networkId`, measures the response speed of the server, and estimates whether the Nodes are Archive Nodes based on RPC URLs.
+Evm Nodes is a CLI-enabled module for checking the activity of Evm Nodes. It provides insights into the status of these nodes, including network connectivity, response speed, and the possibility of querying historical data through Archive Nodes based on RPC URLs.
 
 ## Features:
 - Checking the availability of the Node.
