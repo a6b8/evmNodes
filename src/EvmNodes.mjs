@@ -44,7 +44,7 @@
 
 
 import { config } from './data/config.mjs'
-import { alias } from './data/alias.mjs'
+import { alias } from './data/alias-old.mjs'
 
 import { printMessages } from './helpers/mixed.mjs'
 
