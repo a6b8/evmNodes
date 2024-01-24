@@ -178,7 +178,7 @@ export class CLI {
                     } 
                     return true
                 }
-            } 
+            }  
         ] )
 
         const response2 = await inquirer.prompt( [
