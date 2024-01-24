@@ -137,7 +137,7 @@ export class EvmNodes {
  * @param {boolean} options.onlyActive - Whether to filter nodes by status.
  * @param {boolean} options.aliasAsKey - Switch key from networkId to aliasName if available.
  * @param {boolean} options.useRpcs - Whether to use RPCs for fetching nodes (default is true).
- * @param {boolean} options.useWebsockets - Whether to use Websockets for fetching nodes (default is true).
+ * @param {boolean} options.useWebsockets - Whether to use Websockets for fetching nodes (default is true). 
  * @returns {Promise<GetNodesResponse>} - A promise that resolves to an object containing active and inactive nodes.
  * @throws {Error} If there is an issue fetching the nodes.
  */

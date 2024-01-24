@@ -118,7 +118,7 @@ Die Spalte "Default" wurde hinzugefügt, aber die Werte für die Default-Einstel
 
 **Method**  
 ```js
-async getNodes( { privatePaths=[], onlyActive=false, aliasAsKey=false } )
+async getNodes( { privatePaths=[], onlyActive=false, aliasAsKey=true, useRpcs=true, useWebsockets=true } )
 ```
 
 #### Example  
@@ -154,7 +154,7 @@ This method creates a list from various files and then determines the status of 
 
 **Method**  
 ```js
-.getPrivateNodes( { paths=[], onlyActive=false, aliasAsKey=false } )
+.getPrivateNodes( { paths=[], onlyActive=false, aliasAsKey=true, useRpcs=true, useWebsockets=true } )
 ```
 
 #### Example 
@@ -190,7 +190,7 @@ This method searches for current public Nodes through publicly available [lists]
 
 **Method**  
 ```js
-.getPublicNodes( { onlyActive=false, aliasAsKey=false } )
+.getPublicNodes( { onlyActive=false, aliasAsKey=true, useRpcs=true, useWebsockets=true } )
 ```
 
 #### Example
