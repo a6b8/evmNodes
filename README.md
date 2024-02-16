@@ -104,8 +104,6 @@ There are three public methods defined: `getPrivateNodes`, `getPublicNode`, and 
 
 This method combines `.getPrivateNode()` and `.getPublicNode()` and returns a result.
 
-Um eine weitere Spalte mit dem Namen "default" hinzuzufügen, kannst du die Markdown-Tabelle entsprechend bearbeiten. Hier ist die aktualisierte Tabelle:
-
 | Key           | Type            | Default | Description                                         | Required |
 | ------------- | --------------- | ------- | --------------------------------------------------- | -------- |
 | privatePaths  | Array of Object |         | Each object contains the keys `path` and `parser`. `path` specifies the path, and `parser` offers two options: `env` or `script`. `env` searches for `key=url\n` lines, while `script` searches for URLs in double quotes within `"url"`. | `true`  |
@@ -114,7 +112,6 @@ Um eine weitere Spalte mit dem Namen "default" hinzuzufügen, kannst du die Mark
 | useRpcs       | Boolean         | `true`  | Whether to use RPCs for fetching nodes. | `false` |
 | useWebsockets | Boolean         | `true`  | Whether to use Websockets for fetching nodes. | `false` |
 
-Die Spalte "Default" wurde hinzugefügt, aber die Werte für die Default-Einstellungen fehlen. Du kannst die Werte in der Tabelle entsprechend ergänzen.
 
 **Method**  
 ```js
